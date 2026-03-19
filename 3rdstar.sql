@@ -19,20 +19,15 @@ ORDER BY employee_id ASC;
 
 You are given a table, Projects, containing three columns: Task_ID, Start_Date and End_Date. It is guaranteed that the difference between the End_Date and the Start_Date is equal to 1 day for each row in the table.If the End_Date of the tasks are consecutive, then they are part of the same project. Samantha is interested in finding the total number of different projects completed.
 Write a query to output the start and end dates of projects listed by the number of days it took to complete the project in ascending order. If there is more than one project that have the same number of completion days, then order by the start date of the project.
-SELECT 
-    MIN(Start_Date) project_start,
-    MAX(End_Date) project_end
-FROM (
-    SELECT 
-        Start_Date,
-        End_Date,
-        DATE_SUB(End_Date, INTERVAL ROW_NUMBER() OVER (ORDER BY End_Date) DAY) grp
-    FROM Projects
-) t
-GROUP BY grp
-ORDER BY 
-    DATEDIFF(MAX(End_Date), MIN(Start_Date)),
-    MIN(Start_Date);
+SELECT
+ start_date ,min(end_date) from
+-- start dates not in end dates
+(Select start_date from projects Where start_date not in (select end_date from projects))st,
+-- endates not in start dates
+(Select end_date from projects Where end_date not in (select start_date from projects))ed
+Where start_date<end_date
+group by start_date
+order by min(end_date) - start_date ASC ,start_date ASC;
 
     My Answer(where I got stuck):
 SELECT Start_Date,End_Date, DATEDIFF(End_Date,Start_Date) FROM Projects ORDER BY DATEDIFF(End_Date,Start_Date), Start_Date ASC;
